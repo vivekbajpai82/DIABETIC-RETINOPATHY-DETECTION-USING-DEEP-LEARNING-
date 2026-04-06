@@ -2,10 +2,11 @@
 torch
 torchvision
 fastapi
-uvicorn
+uvicorn[standard]
 timm
 pillow
 numpy
 python-multipart
 huggingface-hub
 opencv-python-headless
+grad-cam
