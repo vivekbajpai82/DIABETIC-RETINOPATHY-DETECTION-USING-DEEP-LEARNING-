@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import io
 from PIL import Image
 from utils import predict 
-from qualitycheck import tumhara_function_name 
+from quality_check import tumhara_function_name 
 
 app = FastAPI()
 
+# CORS for Netlify
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -25,6 +26,7 @@ async def check_quality_route(file: UploadFile = File(...)):
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
         
+        # TUMHARI FILE KA FUNCTION YAHAN CALL HOGA
         result = tumhara_function_name(image) 
         
         return result
