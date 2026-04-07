@@ -10,18 +10,22 @@ from huggingface_hub import hf_hub_download
 
 # --- CONFIG ---
 HF_TOKEN = os.getenv("HF_TOKEN")
-REPO_ID = "vivekbajpai82/dr-models" # Tera purana private repo
+REPO_ID = "vivekbajpai82/dr-models" 
 HF_ENGINE_URL = "https://vivekbajpai82-dr-b5-engine.hf.space/predict_heavy"
 
-# Phase 1 local rahega (Render can handle one B3 model)
+# Phase 1 Transform
 transform_p1 = transforms.Compose([
     transforms.Resize((300, 300)),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
+# compatibility aliases for main.py (ERROR FIX)
+transform_phase1 = transform_p1
+transform_phase23 = transform_p1 
+
 def load_phase1():
-    # Phase 1 download logic (Keeping it same as you mentioned)
+    # Phase 1 download logic
     model_path = hf_hub_download(
         repo_id=REPO_ID,
         filename="phase_1.pth",
@@ -55,7 +59,6 @@ def predict(image: Image.Image):
             return {"prediction": "No_DR", "confidence": round(p1_conf * 100, 2)}
 
         # --- PHASE 2 & 3 (API call to Hugging Face Space) ---
-        # No more downloading Phase 2/3! Directly calling the engine.
         img_byte_arr = io.BytesIO()
         image.save(img_byte_arr, format='JPEG')
         img_byte_arr = img_byte_arr.getvalue()
