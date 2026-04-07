@@ -6,9 +6,10 @@ from utils import predict
 
 app = FastAPI()
 
+# Netlify se request allow karne ke liye (CORS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -16,12 +17,11 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"status": "Backend running 🚀"}
+    return {"status": "Render Backend is Live 🚀"}
 
-
+# Frontend ki khushi ke liye dummy quality check
 @app.post("/check_quality")
 async def check_quality(file: UploadFile = File(...)):
-   
     return {"quality_score": 90, "is_good": True}
 
 @app.post("/predict")
