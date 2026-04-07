@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import io
 from PIL import Image
 from utils import predict 
-from quality_check import tumhara_function_name 
+from quality_check import check_image_quality
 
 app = FastAPI()
 
