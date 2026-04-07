@@ -6,8 +6,9 @@ from huggingface_hub import hf_hub_download
 
 # --- CONFIG ---
 HF_TOKEN = os.getenv("HF_TOKEN")
-REPO_ID = "vivekbajpai82/dr-models" 
+# EKDUM SAHI URL
 HF_ENGINE_URL = "https://vivekbajpai82-dr-b5-engine.hf.space/predict_heavy"
+REPO_ID = "vivekbajpai82/dr-models" 
 
 transform_p1 = transforms.Compose([
     transforms.Resize((224, 224)), 
@@ -16,7 +17,6 @@ transform_p1 = transforms.Compose([
 ])
 
 def load_phase1():
-    # FIXED: 'token' instead of 'use_auth_token'
     model_path = hf_hub_download(
         repo_id=REPO_ID,
         filename="phase_1.pth",
@@ -35,7 +35,7 @@ def load_phase1():
 def predict(image: Image.Image):
     image = image.convert("RGB")
     try:
-        # PHASE 1
+        # --- PHASE 1 (LOCAL) ---
         p1_model = load_phase1()
         img_tensor = transform_p1(image).unsqueeze(0)
         out = p1_model(img_tensor)
@@ -46,14 +46,25 @@ def predict(image: Image.Image):
         if p1_pred == 0:
             return {"prediction": "No_DR", "confidence": round(p1_conf * 100, 2)}
 
-        # PHASE 2 & 3 (Hugging Face API)
+        # --- PHASE 2 & 3 (REMOTE CALL WITH HEADERS) ---
         img_byte_arr = io.BytesIO()
         image.save(img_byte_arr, format='JPEG')
+        
+        # YE LINE 404 KO KHATAM KAREGI
+        headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+        
         response = requests.post(
             HF_ENGINE_URL, 
+            headers=headers,
             files={"file": ("img.jpg", img_byte_arr.getvalue(), "image/jpeg")},
-            timeout=30
+            timeout=60
         )
-        return response.json()
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {"error": f"HF Error {response.status_code}: {response.text}"}
+
     except Exception as e:
-        return {"error": str(e)}
+        gc.collect()
+        return {"error": f"Backend Error: {str(e)}"}
