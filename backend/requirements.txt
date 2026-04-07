@@ -10,3 +10,4 @@ python-multipart
 huggingface-hub
 opencv-python-headless
 grad-cam
+requests
